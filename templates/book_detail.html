@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ book['Book_Title'] }}</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        body {
+            background-color: #f8f9fa;
+        }
+        .book-image {
+            max-height: 400px;
+            object-fit: cover;
+        }
+        .book-detail {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 2px 4px rgba(0,0,0,.1);
+        }
+        .book-rating {
+            font-size: 18px;
+            margin-top: 10px;
+        }
+        .form-control {
+            width: auto;
+        }
+        .btn-primary, .btn-secondary {
+            margin-top: 10px;
+        }
+        .dropdown-menu {
+            padding: 10px;
+            width: 100%;
+        }
+    </style>
+</head>
+<body>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            var flashDiv = document.getElementById('flash-messages');
+            var messages = flashDiv.querySelectorAll('div[data-message]');
+            messages.forEach(function(msgDiv) {
+                var message = msgDiv.getAttribute('data-message');
+                alert(message);
+            });
+        });
+    </script>
+<div id="flash-messages" style="display: none;">
+    {% for message in get_flashed_messages() %}
+    <div data-message="{{ message }}"></div>
+    {% endfor %}
+</div>
+<nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <div class="container">
+        <a class="navbar-brand" href="/">Your Bookshelf</a>
+    </div>
+</nav>
+
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-4 d-flex align-items-center justify-content-center">
+            <img src="{{ book['Image_URL_L'] }}" alt="{{ book['Book_Title'] }}" class="book-image img-thumbnail">
+        </div>
+        <div class="col-md-8">
+            <div class="book-detail">
+                <h2>{{ book['Book_Title'] }}</h2>
+                <p><strong>Author:</strong> {{ book['Book_Author'] }}</p>
+                <p><strong>Year of Publication:</strong> {{ book['Year_Of_Publication'] }}</p>
+                <p><strong>Publisher:</strong> {{ book['Publisher'] }}</p>
+                <p><strong>ISBN:</strong> {{ book['ISBN'] }}</p>
+                <div class="book-rating">
+                    <strong>Average Rating:</strong> {{ avg_rating|round(2, 'floor') }} (from {{ rating_count }} reviews)
+                </div>
+                <form method="POST" class="book-rating-form">
+                    <label for="rating"><strong>Your Rating:</strong></label>
+                    <select class="form-control" name="rating" id="rating">
+                        <option value="0" selected>Not Rated</option>
+                        {% for i in range(1, 11) %}
+                        <option value="{{ i }}">{{ i }}</option>
+                        {% endfor %}
+                    </select>
+                    <button type="submit" class="btn btn-primary">Submit</button>
+                    <button type="button" class="btn btn-secondary" id="add-to-collection-btn">Add to Collection</button>
+                </form>
+
+                <div id="collection-dropdown" class="dropdown-menu" aria-labelledby="add-to-collection-btn" style="display: none;">
+                    <form method="POST" action="/add_to_collection" id="collection-form">
+                        <input type="hidden" name="book_isbn" value="{{ book['ISBN'] }}">
+                        {% if collections %}
+                            {% for collection in collections %}
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" name="collections" value="{{ collection['id'] }}" 
+                                    {% if collection['has_book'] %} checked disabled{% endif %}>
+                                    <label class="form-check-label" for="collection-{{ collection['id'] }}">
+                                        {{ collection['name'] }} 
+                                        {% if collection['has_book'] %} ✔ {% endif %}
+                                    </label>
+                                </div>
+                            {% endfor %}
+                            <button type="submit" class="btn btn-primary">Add to Collection</button>
+                        {% else %}
+                            <p>No collections available. Please create a collection first.</p>
+                            <button type="submit" class="btn btn-primary" disabled>Add to Collection</button>
+                        {% endif %}
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.4.2/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+<script>
+    document.getElementById('add-to-collection-btn').addEventListener('click', function() {
+        var dropdown = document.getElementById('collection-dropdown');
+        dropdown.style.display = dropdown.style.display === 'none' ? 'block' : 'none';
+    });
+
+    document.getElementById('collection-form').addEventListener('submit', function(event) {
+        event.preventDefault();
+        var form = this;
+        var formData = new FormData(form);
+        fetch(form.action, {
+            method: 'POST',
+            body: formData,
+        }).then(response => response.json())
+        .then(data => {
+            alert(data.message);
+            location.reload();
+        }).catch(error => {
+            console.error('Error:', error);
+        });
+    });
+</script>
+</body>
+</html>

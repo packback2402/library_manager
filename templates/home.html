@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Welcome to Your Bookshelf</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        body {
+            padding-top: 80px;
+            background-color: #f7f7f7;
+        }
+        .navbar {
+            margin-bottom: 50px;
+        }
+        .card {
+            margin: 10px;
+        }
+        .card:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 20px 0 rgba(0,0,0,.1);
+        }
+        .card img {
+            height: 200px;
+            object-fit: cover;
+        }
+        .book-title {
+            min-height: 50px;
+            font-family: 'Garamond', serif;
+            font-size: 20px;
+            font-weight: bold;
+        }
+        .book-author {
+            font-family: 'Garamond', serif;
+            font-size: 18px;
+        }
+        .footer {
+            background-color: #222;
+            color: white;
+            text-align: center;
+            padding: 10px 0;
+            position: fixed;
+            left: 0;
+            bottom: 0;
+            width: 100%;
+        }
+        .footer p {
+            margin: 0;
+        }
+    </style>
+</head>
+<body>
+
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+        <div class="container">
+            <a class="navbar-brand" href="/">Your Bookshelf</a>
+                <ul class="navbar-nav ml-auto">
+                    <li class="nav-item">
+                        <a class="nav-link btn-primary" href="a-z">A-Z</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link btn-success" href="/collections">My Collection</a>
+                    </li>
+                </ul>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarResponsive">
+                <ul class="navbar-nav ml-auto">
+                    <li class="nav-item">
+                        <a class="nav-link btn btn-primary" href="/logout">Logout</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <div class="container">
+            <a class="navbar-brand" href="#">Search here:</a>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav">
+                    <!-- other navigation items -->
+                </ul>
+                <form class="form-inline my-2 my-lg-0" action="/search" method="GET">
+                    <input class="form-control mr-sm-2" type="search" placeholder="Search by ISBN, Title, Author" aria-label="Search" name="data">
+                    <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>               
+                </form>
+            </div>
+        </div>
+    </nav>
+    
+    <div class="container">
+        <h1 class="my-4">Books You've Read</h1>
+        <div class="row">
+            {% for book in read_books %}
+                <div class="col-lg-3 col-md-4 col-sm-6 mb-4">
+                    <div class="card h-100">
+                        <!-- Thêm liên kết tới hình ảnh và tiêu đề sách -->
+                        <a href="{{ url_for('book_detail', isbn=book['ISBN']) }}">
+                            <img class="card-img-top" src="{{ book['Image_URL_L'] }}" alt="{{ book['Book_Title'] }}">
+                        </a>
+                        <div class="card-body d-flex flex-column">
+                            <!-- Điều hướng đến trang chi tiết sách khi tiêu đề sách được bấm -->
+                            <a href="{{ url_for('book_detail', isbn=book['ISBN']) }}" class="stretched-link">
+                                <h5 class="book-title">{{ book['Book_Title'] }}</h5>
+                            </a>
+                            <p class="book-author text-muted">{{ book['Book_Author'] }}</p>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+
+        <h1 class="my-4">Recommended for You</h1>
+        <div class="row">
+            {% for book in recommended_books %}
+            <div class="col-lg-3 col-md-4 col-sm-6 mb-4">
+                <div class="card h-100">
+                    <!-- Thêm liên kết tới hình ảnh và tiêu đề sách -->
+                    <a href="{{ url_for('book_detail', isbn=book['ISBN']) }}">
+                        <img class="card-img-top" src="{{ book['Image_URL_L'] }}" alt="{{ book['Book_Title'] }}">
+                    </a>
+                    <div class="card-body d-flex flex-column">
+                        <!-- Điều hướng đến trang chi tiết sách khi tiêu đề sách được bấm -->
+                        <a href="{{ url_for('book_detail', isbn=book['ISBN']) }}" class="stretched-link">
+                            <h5 class="book-title">{{ book['Book_Title'] }}</h5>
+                        </a>
+                        <p class="book-author text-muted">{{ book['Book_Author'] }}</p>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.4.2/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            $.ajax({
+                url: '/get-flash-messages',
+                type: 'GET',
+                success: function(response) {
+                    response.forEach(function(msg) {
+                        var category = msg[0];
+                        var message = msg[1];
+                        // Hiển thị thông báo ở đây
+                        alert(message);
+                    });
+                }
+            });
+        });
+    </script>
+</body>
+</html>

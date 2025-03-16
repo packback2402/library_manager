@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Login</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .bg-custom {
+            background-color: #6c757d;
+            color: white;
+        }
+        .form-signin {
+            width: 100%;
+            max-width: 420px;
+            padding: 15px;
+            margin: auto;
+        }
+        .form-signin .form-control {
+            position: relative;
+            box-sizing: border-box;
+            height: auto;
+            padding: 10px;
+            font-size: 16px;
+        }
+        .form-signin .form-control:focus {
+            z-index: 2;
+        }
+        .form-signin input[type="text"] {
+            margin-bottom: -1px;
+            border-bottom-right-radius: 0;
+            border-bottom-left-radius: 0;
+        }
+        .form-signin input[type="password"] {
+            margin-bottom: 10px;
+        }
+        .form-signin button {
+            background-color: #007bff;
+            border-color: #f8f9fa;
+        }
+        .admin-login-container {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+    </style>
+</head>
+<body class="bg-custom">
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            var flashDiv = document.getElementById('flash-messages');
+            var messages = flashDiv.querySelectorAll('div[data-message]');
+            messages.forEach(function(msgDiv) {
+                var message = msgDiv.getAttribute('data-message');
+                alert(message);
+            });
+        });
+    </script>
+<div id="flash-messages" style="display: none;">
+    {% for message in get_flashed_messages() %}
+    <div data-message="{{ message }}"></div>
+    {% endfor %}
+</div>
+    <div class="admin-login-container">
+        <form class="form-signin" action="{{ url_for('admin_login') }}" method="post">
+            <h1 class="h3 mb-3 font-weight-normal text-center">Admin Login</h1>
+            <label for="username" class="sr-only">Username</label>
+            <input type="text" id="username" name="username" class="form-control" placeholder="Username" required autofocus>
+            <label for="password" class="sr-only">Password</label>
+            <input type="password" id="password" name="password" class="form-control" placeholder="Password" required>
+            <button class="btn btn-lg btn-primary btn-block" type="submit">Sign in</button>
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        <div class="alert alert-{{ category }} mt-3" role="alert">
+                            {{ message }}
+                        </div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+        </form>
+    </div>
+
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/popper.js@1.9.8/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+<script>
+    $(document).ready(function() {
+        $.ajax({
+            url: '/get-flash-messages',
+            type: 'GET',
+            success: function(response) {
+                response.forEach(function(msg) {
+                    var category = msg[0];
+                    var message = msg[1];
+                    // Hiển thị thông báo ở đây
+                    alert(message);
+                });
+            }
+        });
+    });
+</script>
+</body>
+
+</html>

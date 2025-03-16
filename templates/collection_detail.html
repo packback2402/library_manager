@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Edit Collection</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        body {
+            padding-top: 80px;
+            background-color: #f7f7f7;
+        }
+        .navbar {
+            margin-bottom: 50px;
+        }
+        .card {
+            margin: 10px;
+        }
+        .card:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 20px 0 rgba(0,0,0,.1);
+        }
+        .card img {
+            height: 200px;
+            object-fit: cover;
+        }
+        .book-title {
+            min-height: 50px;
+            font-family: 'Garamond', serif;
+            font-size: 20px;
+            font-weight: bold;
+        }
+        .book-author {
+            font-family: 'Garamond', serif;
+            font-size: 18px;
+        }
+        .footer {
+            background-color: #222;
+            color: white;
+            text-align: center;
+            padding: 10px 0;
+            position: fixed;
+            left: 0;
+            bottom: 0;
+            width: 100%;
+        }
+        .footer p {
+            margin: 0;
+        }
+    </style>
+</head>
+<body>
+
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+        <div class="container">
+            <a class="navbar-brand" href="/">Your Bookshelf</a>
+                <ul class="navbar-nav ml-auto">
+                    <li class="nav-item">
+                        <a class="nav-link btn-primary" href="a-z">A-Z</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link btn-success" href="/collections">My Collection</a>
+                    </li>
+                </ul>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarResponsive">
+                <ul class="navbar-nav ml-auto">
+                    <li class="nav-item">
+                        <a class="nav-link btn btn-primary" href="/logout">Logout</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+<div class="container">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            <div class="alert-container mt-4">
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                        {{ message }}
+                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+    {% endwith %}
+    <h1>Edit Collection</h1>
+    <form method="post" action="{{ url_for('collection_detail', id=collection.ID) }}">
+        <div class="form-group">
+            <label for="name">Collection Name</label>
+            <input type="text" class="form-control" id="name" name="name" value="{{ collection.name }}" required>
+        </div>
+        <div class="form-group form-check">
+            <input type="checkbox" class="form-check-input" id="is_public" name="is_public" {% if collection.is_public %}checked{% endif %}>
+            <label class="form-check-label" for="is_public">Public</label>
+        </div>
+        <button type="submit" class="btn btn-primary">Update Collection</button>
+    </form>
+    
+    <h2 class="mt-4">Books in Collection</h2>
+    <form method="post" action="{{ url_for('add_book_to_collection', id=collection.ID) }}">
+        <div class="form-group">
+            <label for="isbn">Add Book (ISBN)</label>
+            <input type="text" class="form-control" id="isbn" name="isbn" required>
+        </div>
+        <button type="submit" class="btn btn-primary">Add Book</button>
+    </form>
+    <ul class="list-group mt-4">
+        {% for book in books %}
+        <li class="list-group-item">
+            <a href="{{ url_for('book_detail', isbn=book.ISBN) }}">
+                {{ book.Book_Title }} by {{ book.Book_Author }}
+            <form action="{{ url_for('remove_book_from_collection', id=collection.ID, isbn=book.ISBN) }}" method="post" style="display:inline;">
+                <button type="submit" class="btn btn-danger btn-sm">Remove</button>
+            </form>
+        </li>
+        {% endfor %}
+    </ul>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.4.2/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>
